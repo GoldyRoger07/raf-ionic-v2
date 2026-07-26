@@ -1,0 +1,7 @@
+{
+  "name": "raf-ionic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
