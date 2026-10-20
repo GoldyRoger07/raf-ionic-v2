@@ -1,37 +1,1016 @@
 /*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
+ * RAF — styles globaux.
+ *
+ * L'interface joueur emprunte les codes des jeux mobiles (Royal Match) : panneaux
+ * encadres, gros boutons en relief qui s'enfoncent au toucher, titres cernes. Tout
+ * est ici, en classes reutilisables (.btn3d, .panel, .pill...) : les pages
+ * n'ajoutent que leur mise en page.
+ *
+ * Palette : uniquement des teintes entre l'orange RAF (--raf-primary) et le blanc.
+ * Trois exceptions, voulues :
+ *   - l'encre (--raf-ink*) et l'arete des reliefs (--raf-edge*), nuances sombres de
+ *     l'orange, sans lesquelles un texte ou un relief serait illisible sur fond clair ;
+ *   - le vert, reserve aux succes ;
+ *   - le rouge, reserve aux erreurs et aux actions destructives.
+ * Les icones illustrees gardent leurs propres couleurs.
  */
 
-/* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
-
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
-@import "@ionic/angular/css/float-elements.css";
-@import "@ionic/angular/css/text-alignment.css";
-@import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+@import "@fontsource/lilita-one/latin.css";
+@import "@fontsource-variable/nunito/wght.css";
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+// ---------------------------------------------------------------------------
+// Palette
+// ---------------------------------------------------------------------------
+
+:root {
+  color-scheme: light;
+
+  // Orange RAF -> blanc.
+  --raf-primary: #ff9a1a;
+  --raf-p400: #ffad47;
+  --raf-p300: #ffc078;
+  --raf-p200: #ffd4a3;
+  --raf-p100: #ffe7cc;
+  --raf-p50: #fff4e6;
+  --raf-white: #ffffff;
+
+  // Aretes des reliefs et encre (exceptions de lisibilite, voir plus haut).
+  --raf-edge: #e08816;
+  --raf-edge-dark: #b86a00;
+  --raf-ink: #4a2f12;
+  --raf-ink-soft: #8a6a45;
+
+  // Semantique.
+  --raf-green: #6fdc3f;
+  --raf-green-dark: #2f8f12;
+  --raf-red: #ff5468;
+  --raf-red-dark: #b5162c;
+
+  // Anciens noms, conserves pour les pages : ils pointent vers la palette.
+  --raf-orange: var(--raf-primary);
+  --raf-orange-dark: var(--raf-edge-dark);
+  --raf-gold: var(--raf-p300);
+  --raf-gold-dark: var(--raf-edge);
+  --raf-cream: var(--raf-p50);
+  --raf-cream-2: var(--raf-p100);
+  --raf-frame: var(--raf-p200);
+  --raf-frame-dark: var(--raf-p400);
+
+  --raf-font-display: 'Lilita One', 'Arial Rounded MT Bold', system-ui, sans-serif;
+  --raf-font: 'Nunito Variable', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --raf-radius: 22px;
+  --raf-safe-top: env(safe-area-inset-top, 0px);
+  --raf-safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  // Ionic
+  --ion-font-family: var(--raf-font);
+  --ion-background-color: var(--raf-p50);
+  --ion-text-color: var(--raf-ink);
+  --ion-color-primary: #ff9a1a;
+  --ion-color-primary-rgb: 255, 154, 26;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #e08816;
+  --ion-color-primary-tint: #ffa431;
+  --ion-color-success: #2f8f12;
+  --ion-color-danger: #d62c43;
+  --ion-toolbar-background: transparent;
+  --ion-toolbar-border-color: transparent;
+}
+
+html,
+body {
+  background: var(--raf-p50);
+  color: var(--raf-ink);
+  font-family: var(--raf-font);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+input,
+textarea {
+  user-select: text;
+}
+
+// ---------------------------------------------------------------------------
+// Fonds
+// ---------------------------------------------------------------------------
+
+// Fond clair : halo blanc en haut, rayons orange tres doux, degrade vers l'orange pale.
+ion-content.raf-sky {
+  --background: transparent;
+  --color: var(--raf-ink);
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 60%),
+    repeating-conic-gradient(from 0deg at 50% -20%, rgba(255, 154, 26, 0.05) 0deg 8deg, rgba(255, 154, 26, 0) 8deg 20deg),
+    linear-gradient(180deg, var(--raf-white) 0%, var(--raf-p50) 40%, var(--raf-p100) 80%, var(--raf-p200) 100%);
+}
+
+// Ecran de jeu : orange plus soutenu, pour marquer qu'on est « dans » la partie.
+ion-content.raf-night {
+  --background: transparent;
+  --color: var(--raf-ink);
+  background:
+    radial-gradient(90% 50% at 50% 0%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, var(--raf-p100) 0%, var(--raf-p200) 55%, var(--raf-p300) 100%);
+}
+
+ion-header.raf-header {
+  box-shadow: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 244, 230, 0.75) 70%, rgba(255, 244, 230, 0) 100%);
+
+  ion-toolbar {
+    --background: transparent;
+    --border-width: 0;
+    --min-height: 62px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+  }
+}
+
+ion-header.raf-header::after {
+  display: none;
+}
+
+// ---------------------------------------------------------------------------
+// Typographie
+// ---------------------------------------------------------------------------
+
+.display {
+  font-family: var(--raf-font-display);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+// Titre blanc cerne d'orange, comme les ecrans des jeux mobiles.
+.title-stroke {
+  font-family: var(--raf-font-display);
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: 0.02em;
+  -webkit-text-stroke: 6px var(--raf-primary);
+  paint-order: stroke fill;
+  text-shadow: 0 4px 0 var(--raf-edge);
+}
+
+.title-stroke.sm {
+  -webkit-text-stroke-width: 4px;
+  text-shadow: 0 3px 0 var(--raf-edge);
+}
+
+.text-gold {
+  color: var(--raf-primary);
+}
+
+// Dans un titre cerne, la mise en avant passe par un contour plus fonce.
+.title-stroke .text-gold {
+  color: #fff;
+  -webkit-text-stroke-color: var(--raf-edge-dark);
+}
+
+.muted {
+  opacity: 0.75;
+}
+
+// ---------------------------------------------------------------------------
+// Boutons en relief
+// ---------------------------------------------------------------------------
+
+// Par defaut : l'orange RAF, pour l'action principale.
+.btn3d {
+  --c1: #ffc078;
+  --c2: #ff9a1a;
+  --edge: var(--raf-edge-dark);
+  --border: #a85f00;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 0 22px 2px;
+  border: 3px solid var(--border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--c1) 0%, var(--c2) 100%);
+  box-shadow:
+    inset 0 4px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -5px 0 rgba(0, 0, 0, 0.08),
+    0 6px 0 var(--edge),
+    0 10px 16px rgba(184, 106, 0, 0.25);
+  color: #fff;
+  font-family: var(--raf-font-display);
+  font-size: 22px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  -webkit-text-stroke: 3px rgba(122, 61, 0, 0.35);
+  paint-order: stroke fill;
+  text-shadow: 0 2px 0 rgba(122, 61, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
+  overflow: hidden;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+
+  // Reflet de vitre en haut du bouton.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 10px;
+    right: 10px;
+    height: 38%;
+    border-radius: 12px 12px 40px 40px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.05));
+    pointer-events: none;
+  }
+
+  &:active:not(:disabled),
+  &.pressed {
+    transform: translateY(5px);
+    box-shadow:
+      inset 0 4px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.08),
+      0 1px 0 var(--edge),
+      0 3px 6px rgba(184, 106, 0, 0.25);
+  }
+
+  &:disabled,
+  &.disabled {
+    filter: grayscale(0.7) brightness(1.05) opacity(0.75);
+    cursor: default;
+  }
+
+  &.block {
+    display: flex;
+    width: 100%;
+  }
+
+  &.lg {
+    min-height: 66px;
+    font-size: 28px;
+    border-radius: 22px;
+  }
+
+  &.sm {
+    min-height: 40px;
+    padding: 0 14px 2px;
+    font-size: 16px;
+    border-radius: 14px;
+    border-width: 2px;
+    -webkit-text-stroke-width: 2px;
+    box-shadow:
+      inset 0 3px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.08),
+      0 4px 0 var(--edge),
+      0 6px 10px rgba(184, 106, 0, 0.22);
+
+    &::before {
+      top: 3px;
+      left: 6px;
+      right: 6px;
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.35), 0 1px 0 var(--edge);
+    }
+  }
+
+  &.icon-only {
+    width: 46px;
+    min-height: 46px;
+    padding: 0;
+  }
+
+  > * {
+    position: relative;
+  }
+}
+
+.btn3d.orange {
+  --c1: #ffb24d;
+  --c2: #ff8f00;
+  --edge: var(--raf-edge-dark);
+  --border: #9a5300;
+}
+
+// Action secondaire : blanc ourle d'orange, texte orange fonce.
+.btn3d.blue,
+.btn3d.cream {
+  --c1: #ffffff;
+  --c2: var(--raf-p100);
+  --edge: var(--raf-p300);
+  --border: var(--raf-p300);
+  color: var(--raf-edge-dark);
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
+
+// Teinte intermediaire (choix « faux », actions tertiaires).
+.btn3d.purple {
+  --c1: var(--raf-p200);
+  --c2: var(--raf-p300);
+  --edge: var(--raf-edge);
+  --border: var(--raf-edge);
+  color: var(--raf-ink);
+  -webkit-text-stroke: 0;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+// Mise en avant douce (classement, reponse choisie).
+.btn3d.gold {
+  --c1: var(--raf-p100);
+  --c2: var(--raf-p300);
+  --edge: var(--raf-edge);
+  --border: var(--raf-edge);
+  color: var(--raf-ink);
+  -webkit-text-stroke: 0;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+// Succes : le vert est reserve a ce qui a reussi.
+.btn3d.green {
+  --c1: #8ff060;
+  --c2: #46be22;
+  --edge: var(--raf-green-dark);
+  --border: #1f6b0e;
+  -webkit-text-stroke-color: rgba(0, 0, 0, 0.28);
+}
+
+// Erreur et action destructive.
+.btn3d.red {
+  --c1: #ff8a96;
+  --c2: #f2364d;
+  --edge: var(--raf-red-dark);
+  --border: #8a0d1f;
+  -webkit-text-stroke-color: rgba(0, 0, 0, 0.28);
+}
+
+// Lien discret.
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 8px;
+  color: var(--raf-edge-dark);
+  font-family: var(--raf-font);
+  font-weight: 800;
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.92;
+  cursor: pointer;
+
+  &.ink {
+    color: var(--raf-ink-soft);
+  }
+}
+
+.pulse {
+  animation: raf-pulse 1.4s ease-in-out infinite;
+}
+
+// ---------------------------------------------------------------------------
+// Panneaux
+// ---------------------------------------------------------------------------
+
+.panel {
+  position: relative;
+  background: linear-gradient(180deg, #ffffff 0%, #fffdf9 60%, var(--raf-p50) 100%);
+  border: 3px solid var(--raf-p200);
+  border-radius: var(--raf-radius);
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.9),
+    0 6px 0 var(--raf-p300),
+    0 12px 22px rgba(184, 106, 0, 0.18);
+  color: var(--raf-ink);
+  padding: 18px;
+
+  &.tight {
+    padding: 12px;
+  }
+
+  h2,
+  h3 {
+    margin: 0;
+    font-family: var(--raf-font-display);
+    font-weight: 400;
+    color: var(--raf-ink);
+  }
+}
+
+// Panneau translucide (sur le fond clair).
+.glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.6));
+  border: 2px solid var(--raf-p200);
+  border-radius: var(--raf-radius);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9), 0 8px 18px rgba(184, 106, 0, 0.14);
+  color: var(--raf-ink);
+}
+
+// Ruban de titre pose sur le haut d'un panneau.
+.ribbon {
+  --rc1: #ffb24d;
+  --rc2: #ff8f00;
+  --redge: #a85f00;
+
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: calc(100% - 40px);
+  margin: -36px auto 12px;
+  padding: 7px 28px 9px;
+  background: linear-gradient(180deg, var(--rc1), var(--rc2));
+  border: 3px solid var(--redge);
+  border-radius: 14px;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.4), 0 4px 0 var(--redge);
+  text-align: center;
+  font-family: var(--raf-font-display);
+  font-size: 21px;
+  color: #fff;
+  -webkit-text-stroke: 4px var(--redge);
+  paint-order: stroke fill;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.blue {
+    --rc1: var(--raf-p300);
+    --rc2: var(--raf-p400);
+    --redge: var(--raf-edge-dark);
+  }
+
+  &.purple {
+    --rc1: var(--raf-p200);
+    --rc2: var(--raf-p300);
+    --redge: var(--raf-edge-dark);
+  }
+
+  &.gold {
+    --rc1: #ffd4a3;
+    --rc2: #ffad47;
+    --redge: var(--raf-edge-dark);
+  }
+
+  // Succes uniquement.
+  &.green {
+    --rc1: #8ae35c;
+    --rc2: #3aa51c;
+    --redge: #1d630b;
+  }
+}
+
+.panel-with-ribbon {
+  margin-top: 34px;
+}
+
+// ---------------------------------------------------------------------------
+// Pastilles (monnaies, compteurs)
+// ---------------------------------------------------------------------------
+
+.pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 10px 0 26px;
+  margin-left: 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff, var(--raf-p50));
+  border: 2px solid var(--raf-p300);
+  box-shadow: inset 0 -2px 0 var(--raf-p100), 0 2px 0 var(--raf-p300);
+  color: var(--raf-ink);
+  font-family: var(--raf-font-display);
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+
+  > .pill-icon {
+    position: absolute;
+    left: -16px;
+    top: 50%;
+    transform: translateY(-50%);
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.2));
+  }
+
+  > .pill-plus {
+    margin-left: 8px;
+    margin-right: -6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    border: 2px solid #a85f00;
+    background: linear-gradient(180deg, #ffc078, #ff9a1a);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 2px 0 #a85f00;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 19px;
+    line-height: 1;
+    padding-bottom: 2px;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--raf-p100);
+  color: var(--raf-ink);
+  font-weight: 800;
+  font-size: 13px;
+  white-space: nowrap;
+
+  &.on-sky {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--raf-p200);
+    color: var(--raf-ink);
+  }
+}
+
+// Etiquette de statut d'un quiz : de l'orange plein (en jeu) au blanc (termine).
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 4px;
+  border-radius: 10px;
+  font-family: var(--raf-font-display);
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  color: #fff;
+  -webkit-text-stroke: 3px rgba(122, 61, 0, 0.35);
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35), 0 2px 0 rgba(184, 106, 0, 0.35);
+  white-space: nowrap;
+
+  &.registration { background: linear-gradient(180deg, #ffc078, #ffad47); }
+  &.scheduled { background: linear-gradient(180deg, #ffd4a3, #ffc078); }
+  &.running { background: linear-gradient(180deg, #ffad47, #ff8f00); }
+  &.closing { background: linear-gradient(180deg, #ff9a1a, #e08816); }
+  &.computing { background: linear-gradient(180deg, #ffe7cc, #ffd4a3); color: var(--raf-ink); -webkit-text-stroke: 0; }
+  &.finished { background: linear-gradient(180deg, #ffffff, #ffe7cc); color: var(--raf-ink-soft); -webkit-text-stroke: 0; }
+  &.cancelled { background: linear-gradient(180deg, #ffffff, #fff4e6); color: var(--raf-ink-soft); -webkit-text-stroke: 0; }
+}
+
+.badge-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ff7a88, #e5203a);
+  border: 2px solid #fff;
+  color: #fff;
+  font-family: var(--raf-font-display);
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+// Barre de progression (joueurs inscrits, chrono).
+.bar {
+  position: relative;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--raf-p100);
+  border: 2px solid var(--raf-p200);
+  box-shadow: inset 0 3px 4px rgba(184, 106, 0, 0.18);
+  overflow: hidden;
+
+  > .fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffc078, #ff9a1a);
+    box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.5);
+    transition: width 0.4s ease;
+  }
+
+  > .label {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-family: var(--raf-font-display);
+    font-size: 13px;
+    -webkit-text-stroke: 3px var(--raf-edge-dark);
+    paint-order: stroke fill;
+  }
+
+  &.on-cream {
+    background: var(--raf-p100);
+    border-color: var(--raf-p300);
+    box-shadow: inset 0 3px 4px rgba(184, 106, 0, 0.2);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Champs de formulaire
+// ---------------------------------------------------------------------------
+
+.field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 14px;
+
+  > .field-label {
+    display: block;
+    margin: 0 0 6px 6px;
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--raf-ink);
+  }
+
+  > .field-hint {
+    display: block;
+    margin: 6px 0 0 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--raf-ink-soft);
+  }
+}
+
+.input-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: #fff;
+  border: 3px solid var(--raf-p200);
+  box-shadow: inset 0 3px 0 rgba(184, 106, 0, 0.08);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+  overflow: hidden;
+
+  &:focus-within {
+    border-color: var(--raf-primary);
+    box-shadow: inset 0 3px 0 rgba(184, 106, 0, 0.08), 0 0 0 4px rgba(255, 154, 26, 0.25);
+  }
+
+  > .prefix {
+    font-weight: 900;
+    font-size: 17px;
+    color: var(--raf-ink-soft);
+  }
+
+  > input,
+  > select {
+    flex: 1;
+    min-width: 0;
+    height: 46px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--raf-ink);
+    font-family: var(--raf-font);
+    font-size: 17px;
+    font-weight: 800;
+
+    &::placeholder {
+      color: var(--raf-p300);
+      font-weight: 700;
+    }
+  }
+
+  > button {
+    border: 0;
+    background: none;
+    padding: 6px;
+    color: var(--raf-ink-soft);
+    font-size: 22px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+}
+
+// Code OTP : un seul grand champ espace.
+.otp-input {
+  width: 100%;
+  height: 66px;
+  border-radius: 18px;
+  border: 3px solid var(--raf-p200);
+  background: #fff;
+  box-shadow: inset 0 3px 0 rgba(184, 106, 0, 0.08);
+  text-align: center;
+  font-family: var(--raf-font-display);
+  font-size: 34px;
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  color: var(--raf-ink);
+  outline: none;
+
+  &:focus {
+    border-color: var(--raf-primary);
+  }
+}
+
+// Message dans un panneau.
+.alert-box {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  background: #ffe3e6;
+  border: 2px solid #ffadb7;
+  color: var(--raf-red-dark);
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.35;
+
+  &.info {
+    background: var(--raf-p50);
+    border-color: var(--raf-p200);
+    color: var(--raf-ink);
+  }
+
+  &.success {
+    background: #e4f9d9;
+    border-color: #a9e58e;
+    color: #1d630b;
+  }
+
+  &.warn {
+    background: var(--raf-p100);
+    border-color: var(--raf-p300);
+    color: #7a4b00;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Listes
+// ---------------------------------------------------------------------------
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: #fff;
+  border: 2px solid var(--raf-p100);
+  box-shadow: 0 3px 0 var(--raf-p200);
+  color: var(--raf-ink);
+
+  & + & {
+    margin-top: 10px;
+  }
+
+  &.clickable {
+    cursor: pointer;
+
+    &:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 var(--raf-p200);
+    }
+  }
+
+  .grow {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .row-title {
+    font-weight: 900;
+    font-size: 15.5px;
+    line-height: 1.25;
+  }
+
+  .row-sub {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--raf-ink-soft);
+    margin-top: 2px;
+  }
+}
+
+.section-title {
+  margin: 24px 4px 12px;
+  font-family: var(--raf-font-display);
+  font-size: 22px;
+  color: #fff;
+  -webkit-text-stroke: 4px var(--raf-primary);
+  paint-order: stroke fill;
+  text-shadow: 0 3px 0 var(--raf-edge);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 26px 16px;
+  color: var(--raf-ink);
+
+  .empty-title {
+    font-family: var(--raf-font-display);
+    font-size: 22px;
+    margin: 10px 0 6px;
+  }
+
+  .empty-text {
+    font-weight: 700;
+    color: var(--raf-ink-soft);
+    margin-bottom: 16px;
+  }
+}
+
+.page-pad {
+  padding: 8px 16px calc(28px + var(--raf-safe-bottom));
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+// Squelette de chargement.
+.skeleton {
+  border-radius: var(--raf-radius);
+  background: linear-gradient(90deg, var(--raf-p50) 0%, var(--raf-p100) 50%, var(--raf-p50) 100%);
+  background-size: 200% 100%;
+  animation: raf-shimmer 1.3s linear infinite;
+}
+
+// ---------------------------------------------------------------------------
+// Popups (ion-modal centre) et toasts
+// ---------------------------------------------------------------------------
+
+ion-modal.raf-popup {
+  --width: min(92vw, 420px);
+  --height: fit-content;
+  --max-height: 92vh;
+  --border-radius: 26px;
+  --background: transparent;
+  --box-shadow: none;
+  --backdrop-opacity: 0.45;
+
+  &::part(content) {
+    overflow: visible;
+  }
+
+  .ion-page {
+    position: relative;
+    contain: none;
+    overflow: visible;
+  }
+}
+
+.popup-close {
+  position: absolute;
+  top: -14px;
+  right: -10px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 3px solid #a85f00;
+  background: linear-gradient(180deg, #ffc078, #ff9a1a);
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.45), 0 4px 0 #a85f00;
+  color: #fff;
+  font-size: 24px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+ion-toast.raf-toast {
+  --background: #ffffff;
+  --color: var(--raf-ink);
+  --border-radius: 18px;
+  --box-shadow: 0 5px 0 var(--raf-p300), 0 12px 20px rgba(184, 106, 0, 0.2);
+  --border-color: var(--raf-p200);
+  --border-width: 3px;
+  --border-style: solid;
+  --width: min(92vw, 420px);
+  font-weight: 800;
+
+  &.error {
+    --background: #fff1f2;
+    --border-color: #ff8a96;
+    --box-shadow: 0 5px 0 #b5162c, 0 12px 20px rgba(0, 0, 0, 0.2);
+    --color: #8a0d1f;
+  }
+
+  &.success {
+    --background: #f3ffe9;
+    --border-color: #8fdc6a;
+    --box-shadow: 0 5px 0 #2f8f12, 0 12px 20px rgba(0, 0, 0, 0.2);
+    --color: #1d630b;
+  }
+}
+
+ion-refresher ion-refresher-content {
+  --color: var(--raf-edge-dark);
+}
+
+ion-infinite-scroll-content {
+  --color: var(--raf-edge-dark);
+}
+
+// ---------------------------------------------------------------------------
+// Animations
+// ---------------------------------------------------------------------------
+
+@keyframes raf-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+
+@keyframes raf-pop-in {
+  0% { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes raf-float {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-10px) rotate(3deg); }
+}
+
+@keyframes raf-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes raf-slide-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes raf-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes raf-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.pop-in {
+  animation: raf-pop-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+
+.slide-up {
+  animation: raf-slide-up 0.35s ease-out both;
+}
+
+.float {
+  animation: raf-float 3.2s ease-in-out infinite;
+}
+
+.shake {
+  animation: raf-shake 0.4s ease;
+}
+
+.stagger > * {
+  animation: raf-slide-up 0.35s ease-out both;
+}
+
+@for $i from 1 through 12 {
+  .stagger > *:nth-child(#{$i}) {
+    animation-delay: #{($i - 1) * 0.05}s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

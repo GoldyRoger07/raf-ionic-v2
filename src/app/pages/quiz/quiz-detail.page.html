@@ -1,0 +1,240 @@
+<ion-header class="raf-header">
+  <ion-toolbar><raf-top-bar back="/accueil" /></ion-toolbar>
+</ion-header>
+
+<ion-content class="raf-sky" [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  <div class="page-pad">
+    @if (error(); as message) {
+      <div class="panel">
+        <div class="alert-box">{{ message }}</div>
+        <button class="btn3d blue block" type="button" (click)="load()">Réessayer</button>
+      </div>
+    } @else if (quiz(); as q) {
+      <!-- Banniere -->
+      <section class="banner pop-in" [style.background]="q.bannerUrl ? null : gradient(q)">
+        @if (q.bannerUrl; as url) {
+          <img [src]="url" alt="" />
+        } @else {
+          <raf-icon class="float" name="trophy" [size]="88" />
+        }
+        <span [class]="'status-tag tag ' + statusCls(q)">{{ statusLabel(q) }}</span>
+      </section>
+      <h1 class="title title-stroke">{{ q.title }}</h1>
+      @if (q.themeLabel) {
+        <div class="theme">{{ q.themeLabel }}</div>
+      }
+
+      <!-- Etat et compte a rebours -->
+      <section class="glass status-box slide-up">
+        @if (line(); as l) {
+          <div class="status-line" [class.urgent]="l.urgent">
+            <raf-icon [name]="l.urgent ? 'flame' : 'clock'" [size]="30" />
+            <span>{{ l.text }}</span>
+          </div>
+        }
+        @if (q.status === 'REGISTRATION') {
+          <div class="bar">
+            <div class="fill" [style.width.%]="playersProgress()"></div>
+            <div class="label">{{ q.playersRegistered }} / {{ q.minPlayers }} joueurs</div>
+          </div>
+          <p class="small">Le quiz démarre {{ q.startDelayMinutes }} min après l'inscription du {{ q.minPlayers }}<sup>e</sup> joueur.</p>
+        }
+        @if (q.status === 'CANCELLED' && q.cancellationReason) {
+          <p class="small">Motif : {{ q.cancellationReason }}</p>
+        }
+        <div class="stats">
+          <div><raf-icon name="users" [size]="26" /><strong>{{ q.playersRegistered }}</strong><span>joueurs</span></div>
+          <div><raf-icon name="ticket" [size]="26" /><strong>{{ activeTickets() }}</strong><span>ticket{{ activeTickets() > 1 ? 's' : '' }} à jouer</span></div>
+          <div><raf-icon name="star" [size]="26" /><strong>{{ bestScore() ?? '—' }}</strong><span>meilleur score</span></div>
+        </div>
+      </section>
+
+      <!-- Mes parties -->
+      @if (submitted().length > 0) {
+        <section class="panel panel-with-ribbon">
+          <div class="ribbon blue">Mes parties</div>
+          @for (s of submitted(); track s.sessionId; let i = $index) {
+            <div class="list-row">
+              <raf-icon [name]="s.score === bestScore() ? 'crown' : 'star'" [size]="30" />
+              <div class="grow">
+                <div class="row-title">Partie {{ submitted().length - i }} : {{ s.score }} pts</div>
+                <div class="row-sub">{{ s.correctCount }} bonne{{ (s.correctCount ?? 0) > 1 ? 's' : '' }} réponse{{ (s.correctCount ?? 0) > 1 ? 's' : '' }} sur {{ q.questionsPerGame }}</div>
+              </div>
+              @if (q.status === 'FINISHED') {
+                <button class="btn3d blue sm" type="button" (click)="review(s.sessionId)">Corrigé</button>
+              }
+            </div>
+          }
+          @if (q.status !== 'FINISHED') {
+            <p class="small ink">Le corrigé sera visible à la fin du quiz. Seul ton meilleur score compte.</p>
+          }
+        </section>
+      }
+
+      <!-- Recompenses -->
+      <section class="panel panel-with-ribbon">
+        <div class="ribbon gold">Récompenses</div>
+        <div class="total">À gagner : <strong>{{ totalPrizes() | htg }}</strong></div>
+        <div class="podium">
+          @for (r of rewards(); track r.rankFrom) {
+            <div class="reward" [class.top]="r.rankFrom === 1">
+              <raf-icon [name]="medal(r)" [size]="r.rankFrom === 1 ? 46 : 38" />
+              <div class="grow">
+                <div class="rank">{{ rankText(r) }}</div>
+                @if (r.label && r.label !== rankText(r)) {
+                  <div class="row-sub">{{ r.label }}</div>
+                }
+              </div>
+              <div class="amount">{{ r.amountHtg | num }} <small>HTG</small></div>
+            </div>
+          }
+        </div>
+        <p class="small ink">Gains versés dans ton solde de gains, retirables vers MonCash, NatCash ou en espèces.</p>
+      </section>
+
+      <!-- Sujet / vote -->
+      @if (q.topicMode === 'VOTE' && q.topics.length > 0) {
+        <section class="panel panel-with-ribbon">
+          <div class="ribbon purple">Vote du sujet</div>
+          @if (q.voteOpen) {
+            <p class="small ink">Les détenteurs d'un ticket choisissent le sujet. Une voix par joueur.</p>
+          } @else if (q.selectedCategoryName) {
+            <p class="small ink">Sujet retenu : <strong>{{ q.selectedCategoryName }}</strong></p>
+          } @else {
+            <p class="small ink">Le vote est fermé.</p>
+          }
+          @for (t of q.topics; track t.id) {
+            <div class="topic" [class.won]="q.selectedCategoryId === t.categoryId && !q.voteOpen">
+              <div class="grow">
+                <div class="row-title">{{ t.label }}</div>
+                <div class="bar on-cream thin"><div class="fill" [style.width.%]="(t.voteCount / maxVotes()) * 100"></div></div>
+              </div>
+              <span class="votes">{{ t.voteCount }}</span>
+              @if (q.voteOpen && ownedTickets() > 0) {
+                <button class="btn3d purple sm" type="button" [disabled]="voting() !== null" (click)="vote(t.id)">
+                  {{ voting() === t.id ? '…' : 'Voter' }}
+                </button>
+              }
+            </div>
+          }
+          @if (q.voteOpen && ownedTickets() === 0) {
+            <div class="alert-box info vote-hint">Prends un ticket pour voter.</div>
+          }
+        </section>
+      } @else if (q.selectedCategoryName) {
+        <section class="glass topic-line">
+          <raf-icon name="question" [size]="30" /> Sujet : <strong>{{ q.selectedCategoryName }}</strong>
+        </section>
+      }
+
+      <!-- Regles -->
+      <section class="panel panel-with-ribbon">
+        <div class="ribbon">Règles</div>
+        <ul class="rules">
+          <li><raf-icon name="ticket" [size]="26" /><span><strong>1 ticket = 1 partie</strong> de {{ q.questionsPerGame }} questions. Rejoue pour améliorer ton score : seul le meilleur compte.</span></li>
+          <li><raf-icon name="clock" [size]="26" /><span><strong>{{ q.questionDurationSeconds }} secondes par question</strong> : tu passes à la suivante dès ta réponse. Pas de retour en arrière ; une question sans réponse compte comme fausse.</span></li>
+          <li><raf-icon name="star" [size]="26" /><span><strong>{{ q.pointsPerCorrect }} points</strong> par bonne réponse, rien de retiré si tu te trompes.</span></li>
+          <li><raf-icon name="flame" [size]="26" /><span>Dès qu'un joueur atteint <strong>{{ q.minScoreThreshold }} points</strong>, il reste {{ closingText(q) }} pour jouer.</span></li>
+          <li><raf-icon name="crown" [size]="26" /><span>À égalité, le joueur qui a commencé sa partie le premier passe devant.</span></li>
+        </ul>
+      </section>
+    } @else {
+      <div class="skeleton" style="height: 180px; margin-bottom: 16px"></div>
+      <div class="skeleton" style="height: 160px; margin-bottom: 16px"></div>
+      <div class="skeleton" style="height: 220px"></div>
+    }
+  </div>
+</ion-content>
+
+<!-- Barre d'action -->
+@if (quiz(); as q) {
+  <ion-footer class="action-bar">
+    <div class="actions">
+      @if (playable() && (activeTickets() > 0 || inProgress())) {
+        <button class="btn3d lg block pulse" type="button" (click)="play()">
+          <raf-icon name="play" [size]="26" />
+          {{ inProgress() ? 'Reprendre' : 'Jouer' }}
+          @if (activeTickets() > 1) {
+            <span class="count">×{{ activeTickets() }}</span>
+          }
+        </button>
+        @if (buyable() && !ticketLimitReached() && !soldOut()) {
+          <button class="btn3d orange icon-only lg" type="button" aria-label="Prendre un autre ticket" (click)="openBuy()">
+            <raf-icon name="plus" [size]="26" />
+          </button>
+        }
+      } @else if (buyable()) {
+        @if (soldOut()) {
+          <button class="btn3d block" type="button" disabled>Complet</button>
+        } @else if (ticketLimitReached()) {
+          <button class="btn3d block" type="button" disabled>Limite de tickets atteinte</button>
+        } @else {
+          <button class="btn3d orange lg block" type="button" (click)="openBuy()">
+            <raf-icon name="ticket" [size]="32" /> Ticket
+            <span class="price"><raf-icon name="coin" [size]="26" />{{ q.ticketPriceCredits }}</span>
+          </button>
+        }
+      } @else if (q.status === 'FINISHED') {
+        <button class="btn3d gold lg block" type="button" (click)="leaderboard()">
+          <raf-icon name="trophy" [size]="32" /> Classement
+        </button>
+      } @else if (q.status === 'COMPUTING') {
+        <button class="btn3d block" type="button" disabled>Calcul du classement…</button>
+      } @else {
+        <button class="btn3d blue block" type="button" (click)="nav.navigateBack('/accueil')">Voir les autres quiz</button>
+      }
+    </div>
+  </ion-footer>
+
+  <!-- Achat d'un ticket -->
+  <ion-modal class="raf-popup" [isOpen]="buyOpen()" (didDismiss)="buyOpen.set(false)">
+    <ng-template>
+      <div class="panel popup">
+        <button class="popup-close" type="button" aria-label="Fermer" (click)="buyOpen.set(false)">
+          <raf-icon name="close" [size]="22" />
+        </button>
+        @if (bought(); as t) {
+          <div class="ribbon green">Ticket obtenu !</div>
+          <div class="popup-art">
+            <raf-icon class="pop-in" name="ticket" [size]="110" />
+          </div>
+          <p class="center code">N° {{ t.code }}</p>
+          @if (playable()) {
+            <button class="btn3d lg block pulse" type="button" (click)="play()"><raf-icon name="play" [size]="26" /> Jouer maintenant</button>
+          } @else {
+            <p class="center small ink">Tu joueras dès le démarrage du quiz. Nous te préviendrons !</p>
+            <button class="btn3d block" type="button" (click)="buyOpen.set(false)">Super !</button>
+          }
+        } @else {
+          <div class="ribbon">Prendre un ticket</div>
+          <div class="popup-art">
+            <raf-icon class="float" name="ticket" [size]="96" />
+          </div>
+          <div class="price-row">
+            <span>Prix</span>
+            <strong><raf-icon name="coin" [size]="28" /> {{ q.ticketPriceCredits }} crédits</strong>
+          </div>
+          <div class="price-row">
+            <span>Ton solde</span>
+            <strong [class.short]="!canAfford()"><raf-icon name="coin" [size]="28" /> {{ state.wallet()?.creditBalance ?? '…' }} crédits</strong>
+          </div>
+          @if (buyError(); as message) {
+            <div class="alert-box">{{ message }}</div>
+          }
+          @if (state.wallet() && !canAfford()) {
+            <div class="alert-box warn">Il te manque {{ q.ticketPriceCredits - (state.wallet()?.creditBalance ?? 0) }} crédits.</div>
+            <button class="btn3d block" type="button" (click)="goTopUp()"><raf-icon name="plus" [size]="22" /> Recharger</button>
+          } @else {
+            <button class="btn3d orange lg block" type="button" [disabled]="buying()" (click)="confirmBuy()">
+              {{ buying() ? 'Achat…' : 'Confirmer' }}
+            </button>
+          }
+        }
+      </div>
+    </ng-template>
+  </ion-modal>
+}

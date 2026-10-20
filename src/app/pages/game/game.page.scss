@@ -1,0 +1,467 @@
+.screen {
+  position: relative;
+  min-height: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: calc(10px + var(--raf-safe-top)) 16px calc(24px + var(--raf-safe-bottom));
+  display: flex;
+  flex-direction: column;
+}
+
+// --- Bandeau ----------------------------------------------------------------------
+
+.hud {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+}
+
+.counter {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 16px 6px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid var(--raf-p300);
+  box-shadow: 0 3px 0 var(--raf-p300);
+  color: var(--raf-ink);
+  line-height: 1;
+
+  .counter-label {
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--raf-ink-soft);
+  }
+
+  .counter-value {
+    font-family: var(--raf-font-display);
+    font-size: 28px;
+
+    small {
+      font-size: 17px;
+      color: var(--raf-ink-soft);
+    }
+  }
+}
+
+.timer {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex: none;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+    filter: drop-shadow(0 4px 0 rgba(184, 106, 0, 0.35));
+  }
+
+  circle {
+    fill: none;
+    stroke-width: 8;
+  }
+
+  .track {
+    fill: #ffffff;
+    stroke: var(--raf-p100);
+  }
+
+  .progress {
+    stroke: var(--raf-primary);
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.1s linear, stroke 0.3s ease;
+  }
+
+  .seconds {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--raf-font-display);
+    font-size: 26px;
+    color: var(--raf-edge-dark);
+  }
+
+  &.hurry {
+    animation: raf-pulse 0.8s ease-in-out infinite;
+
+    .progress {
+      stroke: var(--raf-red);
+    }
+
+    .seconds {
+      color: var(--raf-red-dark);
+    }
+  }
+}
+
+.spacer {
+  flex: 1;
+}
+
+// --- Scenes -----------------------------------------------------------------------
+
+.center-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.big-count,
+.big-go {
+  font-family: var(--raf-font-display);
+  font-size: 160px;
+  line-height: 1;
+  color: #fff;
+  -webkit-text-stroke: 12px var(--raf-primary);
+  paint-order: stroke fill;
+  text-shadow: 0 10px 0 var(--raf-edge-dark);
+}
+
+.big-go {
+  -webkit-text-stroke-color: var(--raf-edge);
+}
+
+.big-text {
+  font-family: var(--raf-font-display);
+  font-size: 38px;
+  color: #fff;
+  -webkit-text-stroke: 6px var(--raf-primary);
+  paint-order: stroke fill;
+}
+
+// --- Introduction -----------------------------------------------------------------
+
+.intro {
+  text-align: center;
+  padding-top: 8px;
+
+  h1 {
+    font-size: 30px;
+    margin: 8px 0 12px;
+  }
+
+  .panel {
+    text-align: left;
+  }
+}
+
+.rules {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+
+  li {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+}
+
+.tickets-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--raf-ink-soft);
+  margin: 0 0 14px;
+}
+
+// --- Question ---------------------------------------------------------------------
+
+.play {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.question {
+  margin-top: 30px;
+  text-align: center;
+  padding: 22px 18px;
+}
+
+.question-img {
+  display: block;
+  max-width: 100%;
+  max-height: 180px;
+  margin: 0 auto 12px;
+  border-radius: 14px;
+  border: 3px solid #fff;
+  box-shadow: 0 3px 0 rgba(184, 106, 0, 0.2);
+}
+
+.question-text {
+  margin: 0;
+  font-weight: 900;
+  font-size: 21px;
+  line-height: 1.3;
+}
+
+.choices {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+
+  &.duo {
+    grid-template-columns: 1fr 1fr;
+
+    .choice {
+      min-height: 120px;
+      justify-content: center;
+      font-size: 26px;
+
+      .choice-text {
+        text-align: center;
+        font-family: var(--raf-font-display);
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+.choice {
+  justify-content: flex-start;
+  min-height: 64px;
+  padding: 8px 16px 10px 10px;
+  text-transform: none;
+  font-family: var(--raf-font);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  text-align: left;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.2s ease, filter 0.2s ease;
+
+  .letter {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--raf-p100);
+    color: var(--raf-edge-dark);
+    font-family: var(--raf-font-display);
+    font-size: 22px;
+    font-weight: 400;
+    text-shadow: none;
+    box-shadow: 0 3px 0 var(--raf-p300);
+  }
+
+  .choice-img {
+    width: 52px;
+    height: 52px;
+    flex: none;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #fff;
+  }
+
+  .choice-text {
+    flex: 1;
+    line-height: 1.25;
+  }
+
+  &.gold .letter {
+    background: #fff;
+    color: var(--raf-edge-dark);
+  }
+
+  &.faded {
+    opacity: 0.45;
+    filter: saturate(0.5);
+  }
+}
+
+.saved {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+  font-weight: 900;
+  color: var(--raf-edge-dark);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+
+  &.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  &.missed {
+    color: var(--raf-red-dark);
+  }
+}
+
+// --- Resultat ---------------------------------------------------------------------
+
+.result {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.rays {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  width: 640px;
+  height: 640px;
+  margin-left: -320px;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.55) 0deg 10deg, transparent 10deg 22deg);
+  mask-image: radial-gradient(circle, #000 0%, transparent 62%);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 62%);
+  animation: raf-spin 30s linear infinite;
+  pointer-events: none;
+}
+
+.result-title {
+  position: relative;
+  font-size: 46px;
+  margin: 6px 0 4px;
+}
+
+.stars {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  margin-bottom: 8px;
+
+  .star:not(.mid) {
+    margin-bottom: 6px;
+  }
+}
+
+.score-panel {
+  position: relative;
+  width: 100%;
+  text-align: center;
+  margin-top: 26px;
+}
+
+.score-label {
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--raf-ink-soft);
+  font-size: 13px;
+}
+
+.score {
+  font-family: var(--raf-font-display);
+  font-size: 72px;
+  line-height: 1;
+  color: #ff9a1a;
+  -webkit-text-stroke: 8px #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 5px 0 var(--raf-p300);
+  margin: 4px 0 8px;
+
+  small {
+    font-size: 36px;
+    color: var(--raf-p400);
+  }
+}
+
+.prize-won {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 2px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: #e4f9d9;
+  border: 2px solid #a9e58e;
+  color: #1d630b;
+  font-family: var(--raf-font-display);
+  font-size: 26px;
+}
+
+.score-sub {
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.best {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--raf-p100);
+  font-weight: 800;
+}
+
+.note {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--raf-ink-soft);
+  margin: 14px 0 18px;
+  line-height: 1.4;
+}
+
+.result-actions {
+  display: grid;
+  gap: 12px;
+
+  &.two {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// --- Echec et sortie --------------------------------------------------------------
+
+.fail-panel {
+  width: 100%;
+  display: grid;
+  gap: 12px;
+  text-align: center;
+}
+
+.fail-text {
+  margin: 0;
+  font-weight: 900;
+  font-size: 17px;
+}
+
+.fail-hint {
+  margin: 0;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--raf-ink-soft);
+}
+
+.quit {
+  margin-top: 30px;
+  display: grid;
+  gap: 12px;
+  text-align: center;
+
+  p {
+    margin: 0 0 6px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+}

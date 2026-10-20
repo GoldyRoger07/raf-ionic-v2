@@ -1,0 +1,210 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+
+import { api } from './api-url';
+import {
+  AppNotification,
+  DeviceSession,
+  GameAnswer,
+  GameMode,
+  GameOutcome,
+  GameResult,
+  GameStart,
+  GameTurn,
+  Leaderboard,
+  MessageResponse,
+  NotificationPreference,
+  Page,
+  Quiz,
+  Ticket,
+  TopUp,
+  Transaction,
+  User,
+  Wallet,
+  Withdrawal,
+  WithdrawalRequest,
+} from './models';
+
+function paging(page: number, size: number): HttpParams {
+  return new HttpParams().set('page', page).set('size', size);
+}
+
+/** Endpoints de l'API utilises par l'application joueur. */
+@Injectable({ providedIn: 'root' })
+export class ApiService {
+  private readonly http = inject(HttpClient);
+
+  // --- Compte -----------------------------------------------------------------
+
+  me(): Observable<User> {
+    return this.http.get<User>(api('/me'));
+  }
+
+  forgotPassword(email: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(api('/auth/password/forgot'), { email: email.trim() });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(api('/auth/password/reset'), { token, newPassword });
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(api('/auth/password/change'), { currentPassword, newPassword });
+  }
+
+  verifyEmail(token: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(api('/auth/email/verify'), { token });
+  }
+
+  resendVerification(email: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(api('/auth/email/resend'), { email });
+  }
+
+  sendPhoneOtp(): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(api('/auth/phone/send-otp'), {});
+  }
+
+  verifyPhone(code: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(api('/auth/phone/verify'), { code });
+  }
+
+  sessions(): Observable<DeviceSession[]> {
+    return this.http.get<DeviceSession[]>(api('/me/sessions'));
+  }
+
+  revokeSession(id: number): Observable<MessageResponse> {
+    return this.http.delete<MessageResponse>(api(`/me/sessions/${id}`));
+  }
+
+  revokeAllSessions(): Observable<MessageResponse> {
+    return this.http.delete<MessageResponse>(api('/me/sessions'));
+  }
+
+  // --- Quiz et tickets ---------------------------------------------------------
+
+  quizzes(page = 0, size = 30, mode: GameMode = 'GROUP'): Observable<Page<Quiz>> {
+    return this.http.get<Page<Quiz>>(api('/quizzes'), { params: paging(page, size).set('mode', mode) });
+  }
+
+  quiz(id: number): Observable<Quiz> {
+    return this.http.get<Quiz>(api(`/quizzes/${id}`));
+  }
+
+  buyTicket(quizId: number, idempotencyKey: string): Observable<Ticket> {
+    return this.http.post<Ticket>(api(`/quizzes/${quizId}/tickets`), { idempotencyKey });
+  }
+
+  quizTickets(quizId: number): Observable<Ticket[]> {
+    return this.http.get<Ticket[]>(api(`/quizzes/${quizId}/tickets`));
+  }
+
+  myTickets(page = 0, size = 100): Observable<Page<Ticket>> {
+    return this.http.get<Page<Ticket>>(api('/tickets'), { params: paging(page, size) });
+  }
+
+  vote(quizId: number, topicId: number): Observable<Quiz> {
+    return this.http.post<Quiz>(api(`/quizzes/${quizId}/vote/${topicId}`), {});
+  }
+
+  leaderboard(quizId: number, page = 0, size = 50): Observable<Leaderboard> {
+    return this.http.get<Leaderboard>(api(`/quizzes/${quizId}/leaderboard`), { params: paging(page, size) });
+  }
+
+  // --- Parties -----------------------------------------------------------------
+
+  startGame(quizId: number): Observable<GameStart> {
+    return this.http.post<GameStart>(api('/game/start'), { quizId });
+  }
+
+  submitGame(sessionId: number, answers: GameAnswer[], clientDurationMs: number): Observable<GameResult> {
+    return this.http.post<GameResult>(api('/game/submit'), { sessionId, answers, clientDurationMs });
+  }
+
+  /** SEQUENTIAL : repond a la question en cours (choiceId null : passer) et recoit la suivante. */
+  answerQuestion(sessionId: number, questionId: number, choiceId: number | null): Observable<GameTurn> {
+    return this.http.post<GameTurn>(api(`/game/${sessionId}/answer`), { questionId, choiceId });
+  }
+
+  /** Sujets deja joues en solo aujourd'hui : une partie par sujet et par jour. */
+  soloPlayedToday(): Observable<number[]> {
+    return this.http.get<number[]>(api('/game/solo/played-today'));
+  }
+
+  mySessions(quizId: number): Observable<GameResult[]> {
+    return this.http.get<GameResult[]>(api('/game/sessions'), { params: { quizId } });
+  }
+
+  review(sessionId: number): Observable<GameOutcome> {
+    return this.http.get<GameOutcome>(api(`/game/${sessionId}/review`));
+  }
+
+  // --- Portefeuille ------------------------------------------------------------
+
+  wallet(): Observable<Wallet> {
+    return this.http.get<Wallet>(api('/wallet'));
+  }
+
+  transactions(page = 0, size = 20): Observable<Page<Transaction>> {
+    return this.http.get<Page<Transaction>>(api('/wallet/transactions'), { params: paging(page, size) });
+  }
+
+  topUps(page = 0, size = 20): Observable<Page<TopUp>> {
+    return this.http.get<Page<TopUp>>(api('/wallet/topups'), { params: paging(page, size) });
+  }
+
+  sendWithdrawalOtp(): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(api('/wallet/withdrawals/send-otp'), {});
+  }
+
+  requestWithdrawal(request: WithdrawalRequest): Observable<Withdrawal> {
+    return this.http.post<Withdrawal>(api('/wallet/withdrawals'), request);
+  }
+
+  withdrawals(page = 0, size = 20): Observable<Page<Withdrawal>> {
+    return this.http.get<Page<Withdrawal>>(api('/wallet/withdrawals'), { params: paging(page, size) });
+  }
+
+  // --- Notifications -----------------------------------------------------------
+
+  notifications(page = 0, size = 20): Observable<Page<AppNotification>> {
+    return this.http.get<Page<AppNotification>>(api('/notifications'), { params: paging(page, size) });
+  }
+
+  unreadCount(): Observable<{ unread: number }> {
+    return this.http.get<{ unread: number }>(api('/notifications/unread-count'));
+  }
+
+  markRead(id: number): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(api(`/notifications/${id}/read`), {});
+  }
+
+  markAllRead(): Observable<{ marked: number }> {
+    return this.http.post<{ marked: number }>(api('/notifications/read-all'), {});
+  }
+
+  preferences(): Observable<NotificationPreference[]> {
+    return this.http.get<NotificationPreference[]>(api('/notifications/preferences'));
+  }
+
+  updatePreferences(
+    updates: { type: string; channel: string; enabled: boolean }[],
+  ): Observable<NotificationPreference[]> {
+    return this.http.put<NotificationPreference[]>(api('/notifications/preferences'), updates);
+  }
+
+  pushPublicKey(): Observable<{ configured: boolean; publicKey?: string }> {
+    return this.http.get<{ configured: boolean; publicKey?: string }>(api('/notifications/push/public-key'));
+  }
+
+  subscribePush(subscription: PushSubscriptionJSON): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(api('/notifications/push/subscriptions'), {
+      endpoint: subscription.endpoint,
+      keys: subscription.keys,
+    });
+  }
+
+  unsubscribePush(endpoint: string): Observable<MessageResponse> {
+    return this.http.delete<MessageResponse>(api('/notifications/push/subscriptions'), { params: { endpoint } });
+  }
+}
