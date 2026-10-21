@@ -109,6 +109,13 @@ const ICONS: Record<string, string> = {
     <rect x="20" y="13" width="8" height="28" fill="url(#g-gold)" stroke="#8f5d00" stroke-width="2.5"/>
     <path d="M24 13c-3-6-10-7-10-2 0 3 6 2 10 2zM24 13c3-6 10-7 10-2 0 3-6 2-10 2z" fill="url(#g-gold)" stroke="#8f5d00" stroke-width="2.5" stroke-linejoin="round"/>`,
 
+  instagram: `
+    <rect x="6" y="8" width="36" height="36" rx="11" fill="#8a1f5c"/>
+    <rect x="6" y="6" width="36" height="36" rx="11" fill="url(#g-insta)" stroke="#8a1f5c" stroke-width="3"/>
+    <circle cx="24" cy="24" r="8" fill="none" stroke="#fff" stroke-width="3.5"/>
+    <circle cx="33.5" cy="14.5" r="2.4" fill="#fff"/>
+    <rect x="11" y="10" width="15" height="3" rx="1.5" fill="#fff" opacity=".45"/>`,
+
   lock: `
     <path d="M15 21v-5a9 9 0 0 1 18 0v5" fill="none" stroke="#5c6270" stroke-width="4"/>
     <rect x="9" y="20" width="30" height="22" rx="4" fill="url(#g-gold)" stroke="#8f5d00" stroke-width="3"/>
@@ -258,6 +265,9 @@ export class IconComponent {
         </linearGradient>
         <linearGradient id="g-cream" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#ffffff" /><stop offset="1" stop-color="#ffe2b0" />
+        </linearGradient>
+        <linearGradient id="g-insta" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#ffd23f" /><stop offset=".35" stop-color="#ff5a3c" /><stop offset=".7" stop-color="#e0287d" /><stop offset="1" stop-color="#8a3ab9" />
         </linearGradient>
         <linearGradient id="g-brown" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#c98a4a" /><stop offset="1" stop-color="#7a4b17" />

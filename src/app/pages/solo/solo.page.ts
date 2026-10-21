@@ -77,7 +77,11 @@ import { TopBarComponent } from '../../ui/top-bar.component';
                   <div class="subject">{{ q.selectedCategoryName }}</div>
                   <div class="prize"><raf-icon name="cash" [size]="26" /> {{ q.soloPrizeHtg | num }} HTG</div>
                   <div class="chips">
-                    <span class="chip"><raf-icon name="coin" [size]="18" />{{ q.ticketPriceCredits }}</span>
+                    @if (q.free) {
+                      <span class="chip free"><raf-icon name="gift" [size]="18" />Gratuit</span>
+                    } @else {
+                      <span class="chip"><raf-icon name="coin" [size]="18" />{{ q.ticketPriceCredits }}</span>
+                    }
                     <span class="chip"><raf-icon name="question" [size]="18" />{{ q.questionsPerGame }} × {{ q.questionDurationSeconds }} s</span>
                   </div>
                 </div>

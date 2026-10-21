@@ -10,6 +10,7 @@ import { CurrentQuestion, GameAnswer, GameQuestion, GameResult, GameStart, GameT
 import { PlayerStateService } from '../../core/player-state.service';
 import { storage } from '../../core/storage';
 import { IconComponent } from '../../ui/icon.component';
+import { InstagramCardComponent } from '../../ui/instagram-card.component';
 import { NumPipe } from '../../ui/pipes';
 
 type Phase = 'loading' | 'intro' | 'countdown' | 'starting' | 'playing' | 'submitting' | 'result' | 'failed';
@@ -58,7 +59,7 @@ const MISSED_FLASH_MS = 700;
  */
 @Component({
   selector: 'raf-game',
-  imports: [IonContent, IonIcon, IonModal, IconComponent, NumPipe],
+  imports: [IonContent, IonIcon, IonModal, IconComponent, InstagramCardComponent, NumPipe],
   templateUrl: './game.page.html',
   styleUrl: './game.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

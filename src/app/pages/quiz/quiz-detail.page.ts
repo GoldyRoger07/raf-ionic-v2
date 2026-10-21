@@ -33,6 +33,7 @@ import {
   totalPrizesHtg,
 } from '../../core/quiz-rules';
 import { IconComponent } from '../../ui/icon.component';
+import { InstagramCardComponent } from '../../ui/instagram-card.component';
 import { HtgPipe, NumPipe } from '../../ui/pipes';
 import { TopBarComponent } from '../../ui/top-bar.component';
 
@@ -48,6 +49,7 @@ import { TopBarComponent } from '../../ui/top-bar.component';
     IonRefresherContent,
     TopBarComponent,
     IconComponent,
+    InstagramCardComponent,
     NumPipe,
     HtgPipe,
   ],

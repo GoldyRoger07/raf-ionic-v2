@@ -171,11 +171,23 @@
         @if (soldOut()) {
           <button class="btn3d block" type="button" disabled>Complet</button>
         } @else if (ticketLimitReached()) {
-          <button class="btn3d block" type="button" disabled>Limite de tickets atteinte</button>
+          <button class="btn3d block" type="button" disabled>
+            @if (activeTickets() > 0) {
+              <raf-icon name="ticket" [size]="26" /> Ticket en poche, départ bientôt
+            } @else if (q.free) {
+              Ticket offert déjà joué
+            } @else {
+              Limite de tickets atteinte
+            }
+          </button>
         } @else {
           <button class="btn3d orange lg block" type="button" (click)="openBuy()">
             <raf-icon name="ticket" [size]="32" /> Ticket
-            <span class="price"><raf-icon name="coin" [size]="26" />{{ q.ticketPriceCredits }}</span>
+            @if (q.free) {
+              <span class="price">Gratuit</span>
+            } @else {
+              <span class="price"><raf-icon name="coin" [size]="26" />{{ q.ticketPriceCredits }}</span>
+            }
           </button>
         }
       } @else if (q.status === 'FINISHED') {
@@ -209,19 +221,30 @@
             <p class="center small ink">Tu joueras dès le démarrage du quiz. Nous te préviendrons !</p>
             <button class="btn3d block" type="button" (click)="buyOpen.set(false)">Super !</button>
           }
+          @if (q.free) {
+            <raf-instagram-card variant="thanks" />
+          }
         } @else {
           <div class="ribbon">Prendre un ticket</div>
           <div class="popup-art">
             <raf-icon class="float" name="ticket" [size]="96" />
           </div>
-          <div class="price-row">
-            <span>Prix</span>
-            <strong><raf-icon name="coin" [size]="28" /> {{ q.ticketPriceCredits }} crédits</strong>
-          </div>
-          <div class="price-row">
-            <span>Ton solde</span>
-            <strong [class.short]="!canAfford()"><raf-icon name="coin" [size]="28" /> {{ state.wallet()?.creditBalance ?? '…' }} crédits</strong>
-          </div>
+          @if (q.free) {
+            <div class="price-row">
+              <span>Prix</span>
+              <strong><raf-icon name="gift" [size]="28" /> Offert</strong>
+            </div>
+            <p class="center small ink">Ce quiz est gratuit : un ticket par joueur, et de vrais gains à la clé.</p>
+          } @else {
+            <div class="price-row">
+              <span>Prix</span>
+              <strong><raf-icon name="coin" [size]="28" /> {{ q.ticketPriceCredits }} crédits</strong>
+            </div>
+            <div class="price-row">
+              <span>Ton solde</span>
+              <strong [class.short]="!canAfford()"><raf-icon name="coin" [size]="28" /> {{ state.wallet()?.creditBalance ?? '…' }} crédits</strong>
+            </div>
+          }
           @if (buyError(); as message) {
             <div class="alert-box">{{ message }}</div>
           }
@@ -230,7 +253,7 @@
             <button class="btn3d block" type="button" (click)="goTopUp()"><raf-icon name="plus" [size]="22" /> Recharger</button>
           } @else {
             <button class="btn3d orange lg block" type="button" [disabled]="buying()" (click)="confirmBuy()">
-              {{ buying() ? 'Achat…' : 'Confirmer' }}
+              {{ buying() ? (q.free ? 'Un instant…' : 'Achat…') : (q.free ? 'Prendre mon ticket' : 'Confirmer') }}
             </button>
           }
         }

@@ -113,6 +113,8 @@ export interface Quiz {
   selectedCategoryName: string | null;
   ticketPriceCredits: number;
   ticketPriceHtg: number;
+  /** Ticket ou partie offerts (prix a 0) : un seul ticket par joueur en groupe. */
+  free: boolean;
   minPlayers: number;
   maxTicketsTotal: number | null;
   maxTicketsPerPlayer: number | null;

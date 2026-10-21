@@ -107,7 +107,11 @@ import { TopBarComponent } from '../../ui/top-bar.component';
                   <div class="spacer"></div>
                   <div class="prize-side">
                     <div><raf-icon name="users" [size]="20" /> {{ q.playersRegistered }}</div>
-                    <div><raf-icon name="coin" [size]="20" /> {{ q.ticketPriceCredits }} / ticket</div>
+                    @if (q.free) {
+                      <div><raf-icon name="gift" [size]="20" /> Gratuit</div>
+                    } @else {
+                      <div><raf-icon name="coin" [size]="20" /> {{ q.ticketPriceCredits }} / ticket</div>
+                    }
                   </div>
                 </div>
                 @if (canPlay(q)) {
@@ -297,6 +301,8 @@ export class HomePage {
   protected readonly error = signal<string | null>(null);
   /** Tickets encore utilisables, par quiz. */
   private readonly activeTickets = signal<Map<number, number>>(new Map());
+  /** Tickets pris, utilises ou non (hors rembourses) : c'est ce que compte le plafond par joueur. */
+  private readonly ownedTickets = signal<Map<number, number>>(new Map());
 
   private readonly sorted = computed(() =>
     [...(this.quizzes() ?? [])].sort((a, b) => statusRank(a.status) - statusRank(b.status)),
@@ -338,12 +344,17 @@ export class HomePage {
         firstValueFrom(this.apiService.myTickets(0, 100)),
       ]);
       const active = new Map<number, number>();
+      const owned = new Map<number, number>();
       for (const t of tickets.content) {
         if (t.status === 'ACTIVE') {
           active.set(t.quizId, (active.get(t.quizId) ?? 0) + 1);
         }
+        if (t.status !== 'REFUNDED') {
+          owned.set(t.quizId, (owned.get(t.quizId) ?? 0) + 1);
+        }
       }
       this.activeTickets.set(active);
+      this.ownedTickets.set(owned);
       this.quizzes.set(page.content);
     } catch (e) {
       if (!this.quizzes()) {
@@ -368,7 +379,8 @@ export class HomePage {
   }
 
   protected canBuy(q: Quiz): boolean {
-    return acceptsTickets(q);
+    const max = q.maxTicketsPerPlayer;
+    return acceptsTickets(q) && (max == null || (this.ownedTickets().get(q.id) ?? 0) < max);
   }
 
   protected open(q: Quiz, event?: Event): void {

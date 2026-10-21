@@ -540,6 +540,12 @@ ion-header.raf-header::after {
     border: 1px solid var(--raf-p200);
     color: var(--raf-ink);
   }
+
+  // Quiz offert.
+  &.free {
+    background: #e4f9d9;
+    color: #1d630b;
+  }
 }
 
 // Etiquette de statut d'un quiz : de l'orange plein (en jeu) au blanc (termine).

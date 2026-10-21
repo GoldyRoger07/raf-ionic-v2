@@ -54,6 +54,9 @@
                 @if (playedToday()) {
                   <div class="alert-box info">Tu as déjà joué ce sujet aujourd'hui. Reviens demain, ou essaie un autre sujet !</div>
                   <button class="btn3d blue block" type="button" (click)="leave()">Autres sujets</button>
+                } @else if (q.free) {
+                  <p class="tickets-left"><raf-icon name="gift" [size]="26" /> Cette partie est offerte</p>
+                  <button class="btn3d lg block pulse" type="button" (click)="launch()"><raf-icon name="play" [size]="26" /> C'est parti !</button>
                 } @else if (state.wallet() && !canAfford()) {
                   <div class="alert-box warn">Il te faut {{ q.ticketPriceCredits }} crédits pour jouer ({{ state.wallet()?.creditBalance }} disponibles).</div>
                   <button class="btn3d block" type="button" (click)="goTopUp()"><raf-icon name="plus" [size]="22" /> Recharger</button>
@@ -174,6 +177,7 @@
                 <div class="result-actions">
                   <button class="btn3d blue" type="button" (click)="leave()">Autres sujets</button>
                 </div>
+                <raf-instagram-card [variant]="quiz()?.free ? 'thanks' : 'news'" />
               } @else {
                 <div class="score-label">Score</div>
                 <div class="score">{{ shownScore() }}</div>
@@ -182,16 +186,24 @@
                   <div class="best"><raf-icon name="crown" [size]="26" /> Ton meilleur score : <strong>{{ r.bestScore }}</strong></div>
                 }
                 <p class="note">Le classement et le corrigé seront publiés à la fin du quiz. Seul ton meilleur score compte.</p>
-                <div class="result-actions two">
-                  <button class="btn3d blue" type="button" (click)="leave()">Retour</button>
-                  <button class="btn3d" type="button" (click)="replay()">
-                    @if (activeTickets() > 0) {
-                      <raf-icon name="play" [size]="22" /> Rejouer
-                    } @else {
-                      <raf-icon name="ticket" [size]="26" /> Rejouer
-                    }
-                  </button>
-                </div>
+                <!-- Quiz gratuit : un seul ticket, pas de nouvel essai a acheter. -->
+                @if (quiz()?.free && activeTickets() === 0) {
+                  <div class="result-actions">
+                    <button class="btn3d blue" type="button" (click)="leave()">Retour</button>
+                  </div>
+                } @else {
+                  <div class="result-actions two">
+                    <button class="btn3d blue" type="button" (click)="leave()">Retour</button>
+                    <button class="btn3d" type="button" (click)="replay()">
+                      @if (activeTickets() > 0) {
+                        <raf-icon name="play" [size]="22" /> Rejouer
+                      } @else {
+                        <raf-icon name="ticket" [size]="26" /> Rejouer
+                      }
+                    </button>
+                  </div>
+                }
+                <raf-instagram-card [variant]="quiz()?.free ? 'thanks' : 'news'" />
               }
             </section>
           </div>

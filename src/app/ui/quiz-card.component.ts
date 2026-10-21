@@ -30,7 +30,11 @@ import { NumPipe } from './pipes';
         <div class="line" [class.urgent]="line().urgent">{{ line().text }}</div>
         <div class="chips">
           <span class="chip"><raf-icon name="trophy" [size]="18" />{{ prize() | num }} HTG</span>
-          <span class="chip"><raf-icon name="coin" [size]="18" />{{ quiz().ticketPriceCredits }}</span>
+          @if (quiz().free) {
+            <span class="chip free"><raf-icon name="gift" [size]="18" />Gratuit</span>
+          } @else {
+            <span class="chip"><raf-icon name="coin" [size]="18" />{{ quiz().ticketPriceCredits }}</span>
+          }
           <span class="chip"><raf-icon name="users" [size]="18" />{{ quiz().playersRegistered }}</span>
         </div>
       </div>
