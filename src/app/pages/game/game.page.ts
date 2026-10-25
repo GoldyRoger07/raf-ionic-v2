@@ -8,6 +8,7 @@ import { errorCode, errorMessage } from '../../core/errors';
 import { FeedbackService } from '../../core/feedback.service';
 import { CurrentQuestion, GameAnswer, GameQuestion, GameResult, GameStart, GameTurn, Quiz } from '../../core/models';
 import { PlayerStateService } from '../../core/player-state.service';
+import { SoundService } from '../../core/sound.service';
 import { storage } from '../../core/storage';
 import { IconComponent } from '../../ui/icon.component';
 import { InstagramCardComponent } from '../../ui/instagram-card.component';
@@ -68,6 +69,7 @@ export class GamePage implements OnDestroy {
   private readonly apiService = inject(ApiService);
   private readonly nav = inject(NavController);
   private readonly feedback = inject(FeedbackService);
+  private readonly sound = inject(SoundService);
   protected readonly state = inject(PlayerStateService);
   private readonly platform = inject(Platform);
   private readonly outlet = inject(IonRouterOutlet, { optional: true });
@@ -144,6 +146,8 @@ export class GamePage implements OnDestroy {
   private pending: PendingAnswer | null = null;
 
   private timer: ReturnType<typeof setInterval> | null = null;
+  /** Derniere seconde ayant joue le tic de fin de chrono. */
+  private lastTickSecond = -1;
   private backButton: Subscription | null = null;
 
   ionViewWillEnter(): void {
@@ -210,9 +214,10 @@ export class GamePage implements OnDestroy {
     // 3, 2, 1 : le chrono serveur ne demarre qu'a l'appel de /start, apres le decompte.
     this.phase.set('countdown');
     this.countdown.set(3);
+    this.sound.play('count');
     const tick = setInterval(() => {
       const next = this.countdown() - 1;
-      this.feedback.tap();
+      this.feedback.tap(next <= 0 ? 'go' : 'count');
       if (next <= 0) {
         clearInterval(tick);
         void this.begin();
@@ -411,6 +416,11 @@ export class GamePage implements OnDestroy {
         ? this.questionEndsAt - performance.now()
         : this.questionStartMs + this.questionDurationMs() - this.elapsedNow();
     this.questionRemainingMs.set(Math.max(0, remaining));
+    // Tic a chaque seconde de la fin du chrono (bandeau rouge « hurry »).
+    if (this.hurry() && this.seconds() !== this.lastTickSecond && remaining > 0) {
+      this.lastTickSecond = this.seconds();
+      this.sound.play('tick');
+    }
     if (remaining <= 0) {
       this.expire();
     }
@@ -423,6 +433,7 @@ export class GamePage implements OnDestroy {
       return;
     }
     void this.feedback.buzz('warning');
+    this.sound.play('timeout');
     this.missed.set(true);
     setTimeout(() => this.missed.set(false), MISSED_FLASH_MS);
 
@@ -440,7 +451,8 @@ export class GamePage implements OnDestroy {
     if (!question || this.phase() !== 'playing' || this.picked() !== null) {
       return;
     }
-    this.feedback.tap();
+    // Son neutre : la reponse est enregistree, sans dire si elle est juste (revelation differee).
+    this.feedback.tap('answer');
     this.picked.set(choiceId);
 
     if (this.game()?.playMode === 'SEQUENTIAL') {
@@ -484,7 +496,9 @@ export class GamePage implements OnDestroy {
     this.stopTimer();
     this.result.set(result);
     this.phase.set('result');
-    void this.feedback.buzz(result.gameMode === 'SOLO' && !result.won ? 'warning' : 'success');
+    const lost = result.gameMode === 'SOLO' && !result.won;
+    void this.feedback.buzz(lost ? 'warning' : 'success');
+    this.sound.play(lost ? 'lose' : 'win');
     this.animateScore(result.score ?? 0);
     void this.state.refreshWallet();
     if (result.gameMode !== 'SOLO') {
@@ -558,6 +572,7 @@ export class GamePage implements OnDestroy {
     this.failCode = code;
     this.phase.set('failed');
     void this.feedback.buzz('error');
+    this.sound.play('error');
   }
 
   protected failCode: string | null = null;

@@ -1,18 +1,19 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { IonContent, IonHeader, IonIcon, IonModal, IonToolbar, NavController } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonIcon, IonModal, IonToggle, IonToolbar, NavController } from '@ionic/angular/standalone';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { FeedbackService } from '../../core/feedback.service';
 import { initials } from '../../core/format';
+import { SoundService } from '../../core/sound.service';
 import { IconComponent } from '../../ui/icon.component';
 import { DatePipe } from '../../ui/pipes';
 import { TopBarComponent } from '../../ui/top-bar.component';
 
 @Component({
   selector: 'raf-profile',
-  imports: [IonHeader, IonToolbar, IonContent, IonIcon, IonModal, TopBarComponent, IconComponent, DatePipe],
+  imports: [IonHeader, IonToolbar, IonContent, IonIcon, IonModal, IonToggle, TopBarComponent, IconComponent, DatePipe],
   template: `
     <ion-header class="raf-header">
       <ion-toolbar><raf-top-bar title="Profil" /></ion-toolbar>
@@ -57,6 +58,11 @@ import { TopBarComponent } from '../../ui/top-bar.component';
 
           <section class="panel panel-with-ribbon">
             <div class="ribbon purple">Réglages</div>
+            <div class="list-row">
+              <raf-icon name="sound" [size]="32" />
+              <span class="grow row-title">Sons du jeu</span>
+              <ion-toggle [checked]="sound.enabled()" (ionChange)="sound.setEnabled($event.detail.checked)" aria-label="Sons du jeu" />
+            </div>
             <button class="list-row clickable" type="button" (click)="nav.navigateForward('/alertes/reglages')">
               <raf-icon name="bell" [size]="32" />
               <span class="grow row-title">Notifications</span>
@@ -153,6 +159,7 @@ export class ProfilePage {
   protected readonly nav = inject(NavController);
   private readonly apiService = inject(ApiService);
   private readonly feedback = inject(FeedbackService);
+  protected readonly sound = inject(SoundService);
 
   protected readonly logoutOpen = signal(false);
   protected readonly resending = signal(false);

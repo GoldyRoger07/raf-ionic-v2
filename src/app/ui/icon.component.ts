@@ -75,6 +75,11 @@ const ICONS: Record<string, string> = {
     <circle cx="24" cy="21.5" r="1.8" fill="#5b3a00"/>
     <path d="M14 12c4-1.6 8-2 10-2" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".35"/>`,
 
+  sound: `
+    <path d="M8 18h7l10-8v28l-10-8H8a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z" fill="url(#g-blue)" stroke="#0d468f" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M31 17a9 9 0 0 1 0 14M36 12a16 16 0 0 1 0 24" fill="none" stroke="#0d468f" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="12" cy="21" rx="2" ry="1.5" fill="#fff" opacity=".55"/>`,
+
   bell: `
     <path d="M24 6a3 3 0 0 1 3 3v1.4c6 1.4 10 6.6 10 13v8l4 5H7l4-5v-8c0-6.4 4-11.6 10-13V9a3 3 0 0 1 3-3z" fill="url(#g-gold)" stroke="#8f5d00" stroke-width="3" stroke-linejoin="round"/>
     <path d="M19 40a5 5 0 0 0 10 0" fill="url(#g-orange)" stroke="#8f5d00" stroke-width="3"/>

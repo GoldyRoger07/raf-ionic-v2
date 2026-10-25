@@ -7,7 +7,8 @@ import { IconComponent } from '../../ui/icon.component';
 
 /**
  * Barre d'onglets du bas, facon jeu mobile : l'onglet actif se souleve et s'illumine.
- * Les deux modes de jeu (En groupe, Solo) sont au centre, toujours sureleves.
+ * Les deux modes de jeu (En groupe, Solo), au centre, ressemblent aux autres
+ * onglets ; actifs, leur tuile est plus grande et son halo respire.
  */
 @Component({
   selector: 'raf-tabs',
@@ -24,11 +25,11 @@ import { IconComponent } from '../../ui/icon.component';
           <span class="label">Tickets</span>
         </ion-tab-button>
         <ion-tab-button tab="accueil" class="raised">
-          <span class="tile"><raf-icon name="users" [size]="40" /></span>
+          <span class="tile"><raf-icon name="users" [size]="32" /></span>
           <span class="label">En groupe</span>
         </ion-tab-button>
         <ion-tab-button tab="solo" class="raised">
-          <span class="tile"><raf-icon name="flame" [size]="40" /></span>
+          <span class="tile"><raf-icon name="flame" [size]="32" /></span>
           <span class="label">Solo</span>
         </ion-tab-button>
         <ion-tab-button tab="alertes">
@@ -48,14 +49,18 @@ import { IconComponent } from '../../ui/icon.component';
     </ion-tabs>
   `,
   styles: `
+    // Bandeau creme, liseré dore en haut : un cadre de jeu plutot qu'une barre systeme.
     ion-tab-bar {
       --background: transparent;
       --border: 0;
       height: calc(78px + var(--raf-safe-bottom));
       padding: 0 4px var(--raf-safe-bottom);
-      background: linear-gradient(180deg, #ffffff 0%, var(--raf-p50) 60%, var(--raf-p100) 100%);
-      border-top: 3px solid var(--raf-p200);
-      box-shadow: 0 -4px 0 rgba(255, 192, 120, 0.35), 0 -10px 24px rgba(184, 106, 0, 0.14);
+      background: linear-gradient(180deg, #ffffff 0%, var(--raf-p50) 55%, var(--raf-p100) 100%);
+      border-top: 4px solid var(--raf-p300);
+      box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.9),
+        0 -3px 0 var(--raf-edge),
+        0 -10px 24px rgba(184, 106, 0, 0.18);
       overflow: visible;
       contain: none;
     }
@@ -69,6 +74,11 @@ import { IconComponent } from '../../ui/icon.component';
       max-width: 90px;
     }
 
+    // Le bouton interne d'Ionic masque ce qui deborde : les tuiles surelevees doivent sortir de la barre.
+    ion-tab-button::part(native) {
+      overflow: visible;
+    }
+
     .tile {
       position: relative;
       display: grid;
@@ -76,7 +86,22 @@ import { IconComponent } from '../../ui/icon.component';
       width: 50px;
       height: 46px;
       border-radius: 16px;
-      transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.4), background 0.18s ease;
+      transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.5), background 0.18s ease;
+    }
+
+    // Reflet en haut de la tuile, comme sur les boutons du jeu.
+    .tile::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 8px;
+      right: 8px;
+      height: 30%;
+      border-radius: 12px 12px 20px 20px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease;
     }
 
     .label {
@@ -86,48 +111,93 @@ import { IconComponent } from '../../ui/icon.component';
       letter-spacing: 0.03em;
       color: var(--raf-ink-soft);
       white-space: nowrap;
-      transition: color 0.18s ease;
+      transition: color 0.18s ease, transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.5);
     }
 
+    ion-tab-button:active .tile {
+      transform: scale(0.9);
+    }
+
+    // --- Onglet actif : tuile orange soulevee, liseré blanc, halo.
     .tab-selected .tile {
-      transform: translateY(-10px) scale(1.12);
+      transform: translateY(-12px) scale(1.14);
       background: linear-gradient(180deg, #ffc078 0%, #ff9a1a 100%);
       border: 3px solid #ffffff;
-      box-shadow: 0 4px 0 var(--raf-edge-dark), 0 8px 16px rgba(184, 106, 0, 0.3), 0 0 22px rgba(255, 154, 26, 0.45);
+      box-shadow:
+        0 4px 0 var(--raf-edge-dark),
+        0 8px 16px rgba(184, 106, 0, 0.3),
+        0 0 22px rgba(255, 154, 26, 0.45),
+        inset 0 -3px 0 rgba(184, 106, 0, 0.35);
+      animation: tab-pop 0.36s cubic-bezier(0.2, 0.9, 0.3, 1.4);
     }
 
+    .tab-selected .tile::after {
+      opacity: 1;
+    }
+
+    // Libelle actif : lettres blanches cernees, comme les titres du jeu.
     .tab-selected .label {
-      color: var(--raf-edge-dark);
-      transform: translateY(-6px);
       display: inline-block;
+      color: #fff;
+      transform: translateY(-7px);
+      -webkit-text-stroke: 4px var(--raf-edge-dark);
+      paint-order: stroke fill;
+      text-shadow: 0 2px 0 var(--raf-edge-dark);
     }
 
-    // Les deux modes de jeu : toujours sureleves, plus grands.
-    .raised .tile {
+    // --- Les deux modes de jeu, une fois actifs : tuile plus grande, plus haute, halo qui respire.
+    .raised.tab-selected .tile {
       width: 62px;
       height: 58px;
-      margin-top: -22px;
+      margin-top: -32px;
       border-radius: 20px;
-      background: linear-gradient(180deg, #ffffff 0%, var(--raf-p200) 100%);
-      border: 3px solid var(--raf-p300);
-      box-shadow: 0 5px 0 var(--raf-p400), 0 10px 18px rgba(184, 106, 0, 0.25);
+      transform: translateY(-4px) scale(1.08);
+      box-shadow:
+        0 5px 0 var(--raf-edge-dark),
+        0 10px 18px rgba(184, 106, 0, 0.3),
+        0 0 26px rgba(255, 154, 26, 0.5),
+        inset 0 -3px 0 rgba(184, 106, 0, 0.35);
+      animation: tab-pop-raised 0.36s cubic-bezier(0.2, 0.9, 0.3, 1.4), tab-glow 2.4s ease-in-out 0.4s infinite;
     }
 
-    .raised.tab-selected .tile {
-      transform: translateY(-4px) scale(1.06);
-      background: linear-gradient(180deg, #ffc078 0%, #ff9a1a 100%);
-      border-color: #ffffff;
-      box-shadow: 0 5px 0 var(--raf-edge-dark), 0 10px 18px rgba(184, 106, 0, 0.3), 0 0 26px rgba(255, 154, 26, 0.5);
-    }
-
-    // Un onglet sureleve ne se souleve pas davantage : son libelle reste sous la tuile.
+    // La tuile agrandie prend deja la hauteur : le libelle reste a sa place.
     .raised.tab-selected .label {
-      transform: none;
+      transform: translateY(6px);
+    }
+
+    .raised.tab-selected raf-icon {
+      transform: scale(1.2);
     }
 
     .badge-count {
       top: -6px;
       right: -4px;
+    }
+
+    @keyframes tab-pop {
+      0% { transform: translateY(0) scale(0.9); }
+      60% { transform: translateY(-15px) scale(1.2); }
+      100% { transform: translateY(-12px) scale(1.14); }
+    }
+
+    @keyframes tab-pop-raised {
+      0% { transform: translateY(0) scale(0.92); }
+      60% { transform: translateY(-7px) scale(1.14); }
+      100% { transform: translateY(-4px) scale(1.08); }
+    }
+
+    // Mode de jeu actif : halo qui respire doucement.
+    @keyframes tab-glow {
+      0%, 100% { box-shadow: 0 5px 0 var(--raf-edge-dark), 0 10px 18px rgba(184, 106, 0, 0.3), 0 0 18px rgba(255, 154, 26, 0.35), inset 0 -3px 0 rgba(184, 106, 0, 0.35); }
+      50% { box-shadow: 0 5px 0 var(--raf-edge-dark), 0 10px 18px rgba(184, 106, 0, 0.3), 0 0 32px rgba(255, 154, 26, 0.65), inset 0 -3px 0 rgba(184, 106, 0, 0.35); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tile,
+      .label {
+        transition: none;
+        animation: none !important;
+      }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

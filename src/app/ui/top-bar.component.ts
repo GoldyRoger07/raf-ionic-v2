@@ -8,7 +8,7 @@ import { PlayerStateService } from '../core/player-state.service';
 import { IconComponent } from './icon.component';
 
 /**
- * Barre du haut : retour ou avatar a gauche, titre, et les deux monnaies a droite
+ * Barre du haut : logo RAF a gauche, puis retour ou avatar, titre, et les deux monnaies a droite
  * (credits de jeu et gains retirables), comme les compteurs d'un jeu mobile.
  */
 @Component({
@@ -16,6 +16,10 @@ import { IconComponent } from './icon.component';
   imports: [IconComponent],
   template: `
     <div class="topbar">
+      <button class="logo" type="button" aria-label="Accueil" (click)="router.navigateByUrl('/accueil')">
+        <img src="assets/logo-raf.png" alt="RAF" />
+      </button>
+
       @if (back()) {
         <button class="btn3d sm icon-only back" type="button" aria-label="Retour" (click)="goBack()">
           <raf-icon name="back" [size]="20" />
@@ -86,6 +90,24 @@ import { IconComponent } from './icon.component';
       cursor: pointer;
     }
     .back { flex: none; }
+    .logo {
+      flex: none;
+      padding: 0;
+      border: 0;
+      background: none;
+      line-height: 0;
+      cursor: pointer;
+      img {
+        height: 34px;
+        width: auto;
+        filter: drop-shadow(0 2px 0 rgba(184, 106, 0, 0.35));
+      }
+    }
+    // Petits telephones : le logo retrecit pour laisser la place au titre et aux compteurs.
+    @media (max-width: 380px) {
+      .logo img { height: 26px; }
+      .title { font-size: 19px; }
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

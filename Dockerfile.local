@@ -1,0 +1,13 @@
+# =============================================================================
+# RAF - Image de l'app joueur, a partir du build fait sur la machine :
+#
+#   npm run build                    (configuration production : API sur /api)
+#   docker compose up -d --build     (depuis raf-backend-java)
+# =============================================================================
+
+FROM nginx:stable-alpine3.24-slim
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY www /usr/share/nginx/html
+
+EXPOSE 80

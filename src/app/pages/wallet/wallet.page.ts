@@ -69,7 +69,7 @@ const TYPES: Record<TransactionType, { label: string; icon: string }> = {
             <div>
               <div class="vault-label">Crédits de jeu</div>
               <div class="vault-value">{{ w ? (w.creditBalance | num) : '…' }}</div>
-              <div class="vault-sub">≈ {{ w ? (w.creditBalanceHtg | num) : '…' }} HTG · pour acheter des tickets</div>
+              <div class="vault-sub">1 crédit = {{ state.creditHtgRate() ?? '…' }} HTG · pour acheter des tickets</div>
             </div>
           </div>
           <button class="btn3d block" type="button" (click)="go('/portefeuille/recharger')">

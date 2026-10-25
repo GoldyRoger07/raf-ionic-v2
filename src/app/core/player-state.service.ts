@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiService } from './api.service';
@@ -16,6 +16,11 @@ export class PlayerStateService {
   private timer: ReturnType<typeof setInterval> | null = null;
 
   readonly wallet = signal<Wallet | null>(null);
+  /**
+   * Valeur d'un credit en HTG, telle que le serveur l'applique (parametre credit.htg_rate).
+   * Seule source de ce taux dans l'application : il n'est affiche que dans le Tresor.
+   */
+  readonly creditHtgRate = computed(() => this.wallet()?.htgRate ?? null);
   readonly unread = signal(0);
 
   async refreshWallet(): Promise<Wallet | null> {

@@ -4,11 +4,13 @@ import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { ToastController } from '@ionic/angular/standalone';
 
 import { errorMessage } from './errors';
+import { SoundName, SoundService } from './sound.service';
 
-/** Retours au joueur : toasts aux couleurs du jeu et vibrations (sur telephone). */
+/** Retours au joueur : toasts aux couleurs du jeu, effets sonores et vibrations (sur telephone). */
 @Injectable({ providedIn: 'root' })
 export class FeedbackService {
   private readonly toasts = inject(ToastController);
+  private readonly sound = inject(SoundService);
   private readonly native = Capacitor.isNativePlatform();
 
   async toast(message: string, kind: 'info' | 'success' | 'error' = 'info'): Promise<void> {
@@ -24,16 +26,19 @@ export class FeedbackService {
 
   async error(error: unknown, fallback?: string): Promise<void> {
     void this.buzz('error');
+    this.sound.play('error');
     await this.toast(errorMessage(error, fallback), 'error');
   }
 
   async success(message: string): Promise<void> {
     void this.buzz('success');
+    this.sound.play('success');
     await this.toast(message, 'success');
   }
 
-  /** Vibration courte au toucher d'un bouton important. */
-  tap(): void {
+  /** Son et vibration courte au toucher d'un bouton important. */
+  tap(sound: SoundName = 'tap'): void {
+    this.sound.play(sound);
     if (this.native) {
       void Haptics.impact({ style: ImpactStyle.Light }).catch(() => undefined);
     }

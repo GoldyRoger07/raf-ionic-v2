@@ -5,7 +5,6 @@ import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { AuthService } from '../../core/auth.service';
 import { TopUp } from '../../core/models';
-import { PlayerStateService } from '../../core/player-state.service';
 import { IconComponent } from '../../ui/icon.component';
 import { DateTimePipe, NumPipe } from '../../ui/pipes';
 import { TopBarComponent } from '../../ui/top-bar.component';
@@ -25,8 +24,6 @@ import { TopBarComponent } from '../../ui/top-bar.component';
 
     <ion-content class="raf-sky" [fullscreen]="true">
       <div class="page-pad">
-        <p class="rate glass"><raf-icon name="coin" [size]="30" /> 1 crédit = {{ state.wallet()?.htgRate ?? 5 }} HTG</p>
-
         <section class="option soon">
           <div class="brand moncash">MonCash</div>
           <div class="grow">
@@ -79,16 +76,6 @@ import { TopBarComponent } from '../../ui/top-bar.component';
     </ion-content>
   `,
   styles: `
-    .rate {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px;
-      margin: 0 0 16px;
-      font-family: var(--raf-font-display);
-      font-size: 19px;
-    }
     .option {
       display: flex;
       align-items: center;
@@ -167,7 +154,6 @@ import { TopBarComponent } from '../../ui/top-bar.component';
 })
 export class TopUpPage {
   protected readonly auth = inject(AuthService);
-  protected readonly state = inject(PlayerStateService);
   private readonly apiService = inject(ApiService);
 
   protected readonly topUps = signal<TopUp[]>([]);
