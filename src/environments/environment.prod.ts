@@ -3,5 +3,5 @@
 // publique de l'API avant `ionic cap build`.
 export const environment = {
   production: true,
-  apiUrl: '',
+  apiUrl: 'https://api.rafhaiti.com',
 };
